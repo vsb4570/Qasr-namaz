@@ -1,12 +1,561 @@
-*{box-sizing:border-box} :root{--green:#145c46;--pale:#eaf4ef;--ink:#18332b;--muted:#687a73}
-body{margin:0;background:#f3f7f4;color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;line-height:1.55}
-.top{background:var(--green);color:white;padding:18px max(18px,calc((100% - 850px)/2));display:flex;align-items:center;gap:12px}
-.brandmark{width:44px;height:44px;border-radius:14px;background:#ffffff22;display:grid;place-items:center;font-size:25px}
-h1{font-size:21px;margin:0}.top p{margin:0;color:#d5e8df;font-size:13px}.vtag{margin-left:auto;font-size:11px;border:1px solid #ffffff66;border-radius:20px;padding:4px 9px}
-main{max-width:850px;margin:20px auto;padding:0 14px}.card{background:white;border:1px solid #e0e9e3;border-radius:18px;padding:18px;margin-bottom:15px;box-shadow:0 4px 16px #173b2b08}
-h2{font-size:18px;margin:0 0 8px}h3{font-size:15px;margin:18px 0 8px}.intro p{margin:5px 0 12px}.actions,.searchrow{display:flex;gap:8px;flex-wrap:wrap}
-button,select,input{font:inherit;border-radius:10px;padding:11px 12px;border:1px solid #cbd9d0;background:white;color:var(--ink)}
-button{cursor:pointer;font-weight:650}.primary{background:var(--green);color:white;border-color:var(--green)}.secondary{background:white}
-button:disabled{opacity:.45;cursor:not-allowed}label{display:block;font-weight:600;margin:12px 0 6px}select{width:100%;margin:6px 0 10px}.searchrow input{flex:1;min-width:170px}
-#map{height:320px;border-radius:14px;margin-top:12px;border:1px solid #dce6df;z-index:1}.hint,.muted{color:var(--muted);font-size:13px}.status{font-size:13px;color:#dceee5}.selected{background:var(--pale);padding:13px;border-radius:13px;margin-top:12px}.selected p{margin:6px 0}.savedlist{display:grid;gap:8px}.saveditem{border:1px solid #e1e9e4;border-radius:11px;padding:10px;font-size:14px}.saveditem strong{display:block}.note{border-left:4px solid #d39b35}.note p{margin-bottom:0;font-size:14px}footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}
-@media(max-width:520px){.top{padding:14px}.vtag{font-size:10px}.card{padding:14px}#map{height:280px}.actions button{flex:1}}
+
+/* =================================
+   QASR SALAH
+   Main Stylesheet
+   Responsive Islamic Green Theme
+================================= */
+
+:root {
+  --primary: #145c46;
+  --primary-dark: #0d4434;
+  --primary-light: #e7f3ed;
+
+  --background: #f4f8f5;
+  --surface: #ffffff;
+
+  --text: #18352b;
+  --muted: #718078;
+
+  --border: #dce8e0;
+  --danger: #c0392b;
+
+  --shadow: 0 4px 18px rgba(20, 92, 70, 0.07);
+
+  --radius: 16px;
+}
+
+/* Reset */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family:
+    "Noto Sans Bengali",
+    "Hind Siliguri",
+    system-ui,
+    sans-serif;
+
+  background: var(--background);
+  color: var(--text);
+
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* Header */
+
+.top {
+  background: linear-gradient(
+    135deg,
+    var(--primary),
+    #197253
+  );
+
+  color: white;
+
+  padding: 22px 18px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  box-shadow: var(--shadow);
+}
+
+.brandmark {
+  width: 52px;
+  height: 52px;
+
+  border-radius: 15px;
+
+  background: rgba(255,255,255,0.16);
+
+  display: grid;
+  place-items: center;
+
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.top h1 {
+  font-size: 23px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.top p {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.vtag {
+  margin-left: auto;
+
+  background: rgba(255,255,255,0.15);
+
+  padding: 5px 10px;
+
+  border-radius: 20px;
+
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* Main Layout */
+
+main {
+  width: 100%;
+  max-width: 850px;
+
+  margin: 24px auto;
+  padding: 0 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Cards */
+
+.card {
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+
+  border-radius: var(--radius);
+
+  padding: 22px;
+
+  box-shadow: var(--shadow);
+}
+
+.card h2 {
+  color: var(--primary);
+
+  font-size: 21px;
+
+  margin-bottom: 10px;
+}
+
+.card h3 {
+  font-size: 17px;
+  color: var(--primary);
+
+  margin-bottom: 12px;
+}
+
+.card p {
+  font-size: 14px;
+}
+
+/* Introduction */
+
+.intro {
+  background: linear-gradient(
+    145deg,
+    #ffffff,
+    #eef7f1
+  );
+}
+
+.intro h2 {
+  font-size: 23px;
+}
+
+/* Buttons */
+
+button {
+  border: none;
+
+  border-radius: 11px;
+
+  padding: 12px 18px;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s,
+    transform 0.2s,
+    opacity 0.2s;
+
+  min-height: 45px;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.primary:hover {
+  background: var(--primary-dark);
+}
+
+.secondary {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.secondary:hover {
+  background: #d7ebdf;
+}
+
+/* Action Buttons */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  margin: 18px 0;
+}
+
+.actions button {
+  flex: 1;
+}
+
+/* Status */
+
+.status {
+  background: var(--primary-light);
+
+  color: var(--primary);
+
+  border-radius: 10px;
+
+  padding: 10px 13px;
+
+  font-size: 13px !important;
+}
+
+/* Labels */
+
+label {
+  display: block;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  margin: 14px 0 7px;
+}
+
+/* Input and Select */
+
+input,
+select {
+  width: 100%;
+
+  min-height: 46px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 10px;
+
+  padding: 10px 13px;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  color: var(--text);
+
+  background: white;
+
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--primary);
+
+  box-shadow: 0 0 0 3px rgba(20,92,70,0.10);
+}
+
+/* Search */
+
+.searchrow {
+  display: flex;
+  gap: 9px;
+
+  margin: 12px 0 17px;
+}
+
+.searchrow input {
+  flex: 1;
+  min-width: 0;
+}
+
+.searchrow button {
+  min-width: 85px;
+}
+
+/* Map */
+
+#map {
+  width: 100%;
+  height: 350px;
+
+  border-radius: 14px;
+
+  border: 1px solid var(--border);
+
+  overflow: hidden;
+
+  background: #e8f0eb;
+
+  z-index: 1;
+}
+
+.leaflet-container {
+  font-family: inherit;
+  z-index: 1;
+}
+
+/* Hint */
+
+.hint {
+  color: var(--muted);
+
+  font-size: 13px !important;
+
+  margin: 10px 0;
+}
+
+/* Selected Address */
+
+.selected {
+  background: #f7faf8;
+
+  border: 1px solid var(--border);
+
+  border-radius: 13px;
+
+  padding: 16px;
+
+  margin-top: 16px;
+}
+
+.selected strong {
+  color: var(--primary);
+
+  font-size: 15px;
+}
+
+.selected p {
+  margin: 9px 0;
+
+  overflow-wrap: anywhere;
+}
+
+.selected button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Coordinates */
+
+.muted {
+  color: var(--muted);
+
+  font-size: 12px !important;
+
+  overflow-wrap: anywhere;
+}
+
+/* Saved Addresses */
+
+.saved {
+  margin-top: 22px;
+}
+
+.savedlist {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.savedlist button {
+  width: 100%;
+
+  text-align: left;
+
+  overflow-wrap: anywhere;
+
+  min-height: 48px;
+}
+
+/* Madhhab */
+
+#madhhab {
+  margin-top: 8px;
+}
+
+#madhhabStatus {
+  margin-top: 10px;
+}
+
+/* Religious Notice */
+
+.note {
+  background: #fffdf5;
+
+  border-color: #eee4bf;
+}
+
+.note h2 {
+  color: #80651b;
+}
+
+.note p {
+  color: #645a3b;
+
+  line-height: 1.9;
+}
+
+/* Footer */
+
+footer {
+  background: var(--primary-dark);
+
+  color: white;
+
+  text-align: center;
+
+  padding: 24px 15px;
+
+  margin-top: 35px;
+
+  font-size: 12px;
+}
+
+footer p {
+  margin: 4px 0;
+}
+
+/* Accessibility */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid #70b99b;
+  outline-offset: 3px;
+}
+
+/* Tablet */
+
+@media (min-width: 600px) {
+
+  main {
+    padding: 0 22px;
+    margin-top: 30px;
+  }
+
+  .card {
+    padding: 26px;
+  }
+
+  #map {
+    height: 420px;
+  }
+
+}
+
+/* Desktop */
+
+@media (min-width: 900px) {
+
+  main {
+    max-width: 900px;
+  }
+
+  .top {
+    padding: 24px max(25px, calc((100% - 850px) / 2));
+  }
+
+  #map {
+    height: 450px;
+  }
+
+}
+
+/* Small Mobile */
+
+@media (max-width: 380px) {
+
+  .top {
+    padding: 16px 12px;
+    gap: 9px;
+  }
+
+  .brandmark {
+    width: 43px;
+    height: 43px;
+    font-size: 25px;
+  }
+
+  .top h1 {
+    font-size: 19px;
+  }
+
+  .top p {
+    font-size: 11px;
+  }
+
+  .vtag {
+    font-size: 9px;
+    padding: 4px 7px;
+  }
+
+  main {
+    padding: 0 10px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .searchrow {
+    flex-direction: column;
+  }
+
+  .searchrow button {
+    width: 100%;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+}
+
+/* Reduced Motion */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+
+}
