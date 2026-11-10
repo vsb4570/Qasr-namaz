@@ -1,77 +1,309 @@
+
 <!doctype html>
 <html lang="bn">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
   <meta name="theme-color" content="#145c46">
-  <meta name="description" content="Qasr Salah — সফর ও কসর নামাজ সহায়ক">
-  <title>Qasr Salah</title>
+
+  <meta name="description"
+        content="Qasr Salah — সফর ও কসর নামাজ সহায়ক">
+
+  <meta name="application-name" content="Qasr Salah">
+
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <meta name="apple-mobile-web-app-status-bar-style"
+        content="default">
+
+  <title>Qasr Salah - সফর ও কসর নামাজ সহায়ক</title>
+
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+
+  <link rel="apple-touch-icon" href="icon.svg">
+
+  <!-- Leaflet Map CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  >
+
+  <!-- Main CSS -->
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-<header class="top">
-  <div class="brandmark">ق</div>
-  <div><h1>Qasr Salah</h1><p>সফর ও কসর নামাজ সহায়ক</p></div>
-  <span class="vtag">প্রথম সংস্করণ</span>
-</header>
-<main>
-  <section class="intro card">
-    <h2>আপনার সফরের তথ্য</h2>
-    <p>লোকেশন নির্বাচন করুন, ঠিকানা সংরক্ষণ করুন এবং সফরের তথ্য এক জায়গায় রাখুন।</p>
-    <div class="actions">
-      <button id="locateBtn" class="primary">◎ বর্তমান GPS লোকেশন</button>
-      <button id="clearBtn" class="secondary">তথ্য মুছুন</button>
-    </div>
-    <p id="status" class="status" aria-live="polite">লোকেশন পেতে আপনার অনুমতি লাগবে।</p>
-  </section>
 
-  <section class="card">
-    <h2>ঠিকানা</h2>
-    <label for="placeType">কোন ঠিকানা নির্বাচন করবেন?</label>
-    <select id="placeType">
-      <option value="current">বর্তমান ঠিকানা</option>
-      <option value="home">স্থায়ী ঠিকানা</option>
-      <option value="destination">সফরের গন্তব্য</option>
-    </select>
-    <div class="searchrow">
-      <input id="search" type="search" placeholder="এলাকা, শহর বা ঠিকানা লিখুন">
-      <button id="searchBtn" class="primary">খুঁজুন</button>
-    </div>
-    <div id="map" role="application" aria-label="ঠিকানা বাছাইয়ের মানচিত্র"></div>
-    <p class="hint">মানচিত্রে পিনে ট্যাপ করুন অথবা অনুসন্ধানের ফল বেছে নিন।</p>
-    <div class="selected">
-      <strong>নির্বাচিত ঠিকানা</strong>
-      <p id="selectedAddress">এখনো কোনো ঠিকানা নির্বাচন করা হয়নি।</p>
-      <p id="coords" class="muted"></p>
-      <button id="saveBtn" class="primary" disabled>এই ঠিকানা সংরক্ষণ করুন</button>
-    </div>
-    <div class="saved">
-      <h3>সংরক্ষিত ঠিকানা</h3>
-      <div id="savedList" class="savedlist"></div>
-    </div>
-  </section>
+  <!-- Header -->
+  <header class="top">
 
-  <section class="card">
-    <h2>মাজহাব নির্বাচন</h2>
-    <p class="hint">এটি আপাতত আপনার পছন্দ সংরক্ষণ করে; এখনো শরয়ি হিসাব চালু করা হয়নি।</p>
-    <select id="madhhab">
-      <option value="হানাফি">হানাফি</option>
-      <option value="শাফেয়ি">শাফেয়ি</option>
-      <option value="মালেকি">মালেকি</option>
-      <option value="হাম্বলি">হাম্বলি</option>
-    </select>
-    <p class="muted" id="madhhabStatus"></p>
-  </section>
+    <div class="brandmark">ق</div>
 
-  <section class="card note">
-    <h2>গুরুত্বপূর্ণ ধর্মীয় সতর্কতা</h2>
-    <p>এই প্রথম সংস্করণ ঠিকানা ও লোকেশন সংরক্ষণের প্রোটোটাইপ। কসর প্রযোজ্য হওয়ার দূরত্ব, সফরের নিয়ত, নিজ এলাকার সীমানা এবং অবস্থানের দিনের বিধান মাজহাবভেদে যাচাই না করে স্বয়ংক্রিয় ফতোয়া বা সিদ্ধান্ত দেখানো হবে না। ব্যক্তিগত আমলের আগে নির্ভরযোগ্য আলেমের পরামর্শ নিন।</p>
-  </section>
-</main>
-<footer>Qasr Salah · বিনামূল্যের প্রাথমিক সংস্করণ · মানচিত্র: OpenStreetMap</footer>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="app.js"></script>
+    <div>
+      <h1>Qasr Salah</h1>
+      <p>সফর ও কসর নামাজ সহায়ক</p>
+    </div>
+
+    <span class="vtag">প্রথম সংস্করণ</span>
+
+  </header>
+
+  <main>
+
+    <!-- Introduction -->
+    <section class="intro card">
+
+      <h2>আপনার সফরের তথ্য</h2>
+
+      <p>
+        আপনার অবস্থান নির্বাচন করুন এবং সফরের
+        ঠিকানা সংরক্ষণ করুন।
+      </p>
+
+      <div class="actions">
+
+        <button
+          id="locateBtn"
+          class="primary"
+          type="button"
+        >
+          ◎ বর্তমান GPS লোকেশন
+        </button>
+
+        <button
+          id="clearBtn"
+          class="secondary"
+          type="button"
+        >
+          তথ্য মুছুন
+        </button>
+
+      </div>
+
+      <p
+        id="status"
+        class="status"
+        aria-live="polite"
+        role="status"
+      >
+        GPS অথবা ম্যানুয়ালি লোকেশন নির্বাচন করুন।
+      </p>
+
+    </section>
+
+
+    <!-- Location Section -->
+    <section class="card">
+
+      <h2>লোকেশন নির্বাচন</h2>
+
+      <p class="hint">
+        GPS ছাড়াও আপনি নিজের পছন্দমতো
+        যেকোনো স্থানের লোকেশন নির্বাচন করতে পারবেন।
+      </p>
+
+
+      <!-- Address Type -->
+      <label for="placeType">
+        কোন ঠিকানা নির্বাচন করবেন?
+      </label>
+
+      <select id="placeType">
+
+        <option value="current">
+          বর্তমান ঠিকানা
+        </option>
+
+        <option value="home">
+          স্থায়ী ঠিকানা
+        </option>
+
+        <option value="destination">
+          সফরের গন্তব্য
+        </option>
+
+      </select>
+
+
+      <!-- Search -->
+      <label for="search">
+        এলাকা, শহর বা গ্রামের নাম লিখুন
+      </label>
+
+      <div class="searchrow">
+
+        <input
+          id="search"
+          type="search"
+          placeholder="যেমন: ঢাকা, চট্টগ্রাম, সিলেট"
+          autocomplete="off"
+        >
+
+        <button
+          id="searchBtn"
+          class="primary"
+          type="button"
+        >
+          খুঁজুন
+        </button>
+
+      </div>
+
+
+      <!-- Map -->
+      <div
+        id="map"
+        role="application"
+        aria-label="লোকেশন নির্বাচন করার মানচিত্র"
+      ></div>
+
+      <p class="hint">
+        GPS ছাড়াই মানচিত্রের যেকোনো স্থানে
+        ট্যাপ করুন। পিন সরিয়ে নিজের পছন্দের
+        অবস্থান নির্বাচন করতে পারবেন।
+      </p>
+
+
+      <!-- Selected Location -->
+      <div class="selected">
+
+        <strong>নির্বাচিত ঠিকানা</strong>
+
+        <p id="selectedAddress">
+          এখনো কোনো ঠিকানা নির্বাচন করা হয়নি।
+        </p>
+
+        <p id="coords" class="muted"></p>
+
+        <button
+          id="saveBtn"
+          class="primary"
+          type="button"
+          disabled
+        >
+          এই ঠিকানা সংরক্ষণ করুন
+        </button>
+
+      </div>
+
+
+      <!-- Saved Locations -->
+      <div class="saved">
+
+        <h3>সংরক্ষিত ঠিকানা</h3>
+
+        <div
+          id="savedList"
+          class="savedlist"
+          aria-live="polite"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Madhhab Section -->
+    <section class="card">
+
+      <h2>মাজহাব নির্বাচন</h2>
+
+      <p class="hint">
+        আপনার অনুসরণ করা মাজহাব নির্বাচন করুন।
+        এই সংস্করণে এটি শুধু পছন্দ হিসেবে সংরক্ষিত থাকবে।
+      </p>
+
+      <label for="madhhab">
+        আপনার মাজহাব
+      </label>
+
+      <select id="madhhab">
+
+        <option value="হানাফি">
+          হানাফি
+        </option>
+
+        <option value="শাফেয়ি">
+          শাফেয়ি
+        </option>
+
+        <option value="মালেকি">
+          মালেকি
+        </option>
+
+        <option value="হাম্বলি">
+          হাম্বলি
+        </option>
+
+      </select>
+
+      <p
+        class="muted"
+        id="madhhabStatus"
+        aria-live="polite"
+      ></p>
+
+    </section>
+
+
+    <!-- Religious Notice -->
+    <section class="card note">
+
+      <h2>গুরুত্বপূর্ণ ধর্মীয় সতর্কতা</h2>
+
+      <p>
+        এই প্রথম সংস্করণটি ঠিকানা ও লোকেশন
+        সংরক্ষণের প্রোটোটাইপ।
+
+        কসর প্রযোজ্য হওয়ার দূরত্ব, সফরের নিয়ত,
+        নিজ এলাকার সীমানা এবং অবস্থানের দিনের
+        বিধান মাজহাবভেদে ভিন্ন হতে পারে।
+
+        যাচাই না করে স্বয়ংক্রিয় ফতোয়া বা
+        ধর্মীয় সিদ্ধান্ত দেওয়া হবে না।
+
+        ব্যক্তিগত আমলের আগে নির্ভরযোগ্য
+        আলেমের পরামর্শ নিন।
+      </p>
+
+    </section>
+
+  </main>
+
+
+  <!-- Footer -->
+  <footer>
+
+    <p>
+      Qasr Salah
+    </p>
+
+    <p>
+      বিনামূল্যের সফর ও কসর নামাজ সহায়ক
+    </p>
+
+    <p>
+      মানচিত্র: OpenStreetMap
+    </p>
+
+  </footer>
+
+
+  <!-- Leaflet Map JavaScript -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  ></script>
+
+  <!-- Main Application JavaScript -->
+  <script src="app.js"></script>
+
 </body>
-</html>
+  </html>
+  
