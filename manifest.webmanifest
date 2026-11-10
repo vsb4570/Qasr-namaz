@@ -1,0 +1,22 @@
+
+{
+  "id": "./",
+  "name": "Qasr Salah",
+  "short_name": "Qasr Salah",
+  "description": "সফর ও কসর নামাজ সহায়ক",
+  "lang": "bn",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f8f5",
+  "theme_color": "#145c46",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
