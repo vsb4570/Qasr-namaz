@@ -1,30 +1,12 @@
 
 "use strict";
 
-// ======================================
-// GOOGLE MAPS API KEY
-// ======================================
+// ===================================
+// QASR NAMAZ MAP SYSTEM
+// STREET + SATELLITE
+// ===================================
 
-const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY";
-
-// ======================================
-// ELEMENTS
-// ======================================
-
-const $ = (id) => document.getElementById(id);
-
-const status = $("status");
-const selectedAddress = $("selectedAddress");
-const coords = $("coords");
-
-let map = null;
-let marker = null;
-let geocoder = null;
-let selected = null;
-
-// ======================================
-// STORAGE KEYS
-// ======================================
+const $ = id => document.getElementById(id);
 
 const STORAGE = {
   home: "qasr_home_address",
@@ -32,295 +14,410 @@ const STORAGE = {
   madhhab: "qasr_madhhab"
 };
 
-// ======================================
+let map;
+let marker;
+let selected = null;
+let selectionVersion = 0;
+
+let currentPosition = {
+  lat: 23.8103,
+  lng: 90.4125
+};
+
+// ===================================
 // STATUS
-// ======================================
+// ===================================
 
-function showStatus(message, error = false) {
-  status.textContent = message;
-  status.style.color = error ? "#c0392b" : "#087b50";
+function message(text, error = false) {
+  $("status").textContent = text;
+  $("status").style.color =
+    error ? "#c0392b" : "#087b50";
 }
 
-// ======================================
-// GOOGLE MAPS LOADING
-// ======================================
-
-function loadGoogleMaps() {
-
-  if (
-    !GOOGLE_MAPS_API_KEY ||
-    GOOGLE_MAPS_API_KEY === "YOUR_GOOGLE_MAPS_API_KEY"
-  ) {
-    showStatus(
-      "Google Maps চালু করতে app.js-এ আপনার API Key বসান।",
-      true
-    );
-    return;
-  }
-
-  if (window.google && window.google.maps) {
-    initMap();
-    return;
-  }
-
-  window.initMap = initMap;
-
-  const script = document.createElement("script");
-
-  script.src =
-    "https://maps.googleapis.com/maps/api/js?key=" +
-    encodeURIComponent(GOOGLE_MAPS_API_KEY) +
-    "&callback=initMap&v=weekly";
-
-  script.async = true;
-  script.defer = true;
-
-  script.onerror = () => {
-    showStatus(
-      "Google Maps লোড হয়নি। API Key ও API সেটিং পরীক্ষা করুন।",
-      true
-    );
-  };
-
-  document.head.appendChild(script);
-}
-
-// ======================================
-// INITIALIZE MAP
-// ======================================
+// ===================================
+// MAP INITIALIZATION
+// ===================================
 
 function initMap() {
 
-  const defaultLocation = {
-    lat: 23.8103,
-    lng: 90.4125
-  };
+  if (!window.L) {
+    message("ম্যাপ লাইব্রেরি লোড হয়নি।", true);
+    return;
+  }
 
-  map = new google.maps.Map($("map"), {
-    center: defaultLocation,
-    zoom: 12,
-    mapTypeControl: true,
-    streetViewControl: true,
-    fullscreenControl: true,
+  map = L.map("map", {
     zoomControl: true
-  });
+  }).setView(
+    [currentPosition.lat, currentPosition.lng],
+    13
+  );
 
-  geocoder = new google.maps.Geocoder();
+  // STREET MAP
 
-  marker = new google.maps.Marker({
-    position: defaultLocation,
-    map: map,
-    draggable: true,
-    title: "ঠিকানা নির্বাচন করুন"
-  });
-
-  // ম্যাপে ক্লিক করে ঠিকানা নির্বাচন
-
-  map.addListener("click", (event) => {
-
-    const position = {
-      lat: event.latLng.lat(),
-      lng: event.latLng.lng()
-    };
-
-    selectLocation(position);
-  });
-
-  // পিন সরালে ঠিকানা আপডেট
-
-  marker.addListener("dragend", () => {
-
-    const position = marker.getPosition();
-
-    selectLocation({
-      lat: position.lat(),
-      lng: position.lng()
-    });
-
-  });
-
-  showStatus("Google Maps সফলভাবে চালু হয়েছে।");
-
-  restoreSavedAddresses();
-
-  const saved = getAddress("home") || getAddress("current");
-
-  if (saved) {
-    selectLocation(saved, false);
-  }
-}
-
-// ======================================
-// SELECT LOCATION
-// ======================================
-
-function selectLocation(position, reverse = true) {
-
-  selected = {
-    lat: Number(position.lat),
-    lng: Number(position.lng),
-    address: "ঠিকানা খোঁজা হচ্ছে..."
-  };
-
-  marker.setPosition(position);
-  map.setCenter(position);
-  map.setZoom(16);
-
-  selectedAddress.textContent = selected.address;
-
-  coords.textContent =
-    "Latitude: " + selected.lat.toFixed(6) +
-    " | Longitude: " + selected.lng.toFixed(6);
-
-  if (reverse) {
-    reverseGeocode(position);
-  } else {
-    selected.address = position.address || "সংরক্ষিত ঠিকানা";
-    selectedAddress.textContent = selected.address;
-  }
-}
-
-// ======================================
-// REVERSE GEOCODING
-// ======================================
-
-function reverseGeocode(position) {
-
-  geocoder.geocode(
-    { location: position },
-    (results, resultStatus) => {
-
-      if (resultStatus === "OK" && results.length > 0) {
-
-        const address = results[0].formatted_address;
-
-        if (selected) {
-          selected.address = address;
-          selectedAddress.textContent = address;
-        }
-
-        showStatus("ঠিকানা শনাক্ত হয়েছে।");
-
-      } else {
-
-        if (selected) {
-          selected.address =
-            position.lat + ", " + position.lng;
-
-          selectedAddress.textContent = selected.address;
-        }
-
-        showStatus(
-          "ঠিকানা পাওয়া যায়নি। স্থানাঙ্ক ব্যবহার করতে পারবেন।",
-          true
-        );
-      }
+  const street = L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }
   );
+
+  // SATELLITE MAP
+
+  const satellite = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    {
+      maxZoom: 19,
+      attribution:
+        'Tiles &copy; Esri'
+    }
+  );
+
+  // SATELLITE PLACE LABELS
+
+  const satelliteLabels = L.tileLayer(
+    "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+    {
+      maxZoom: 19,
+      opacity: 0.9,
+      attribution:
+        'Labels &copy; Esri'
+    }
+  );
+
+  // DEFAULT STREET MAP
+
+  street.addTo(map);
+
+  // LAYER SWITCHER
+
+  const baseMaps = {
+    "🗺️ Street Map": street,
+    "🛰️ Satellite Map": satellite
+  };
+
+  L.control.layers(
+    baseMaps,
+    {
+      "স্থাননাম ও সীমানা": satelliteLabels
+    },
+    {
+      collapsed: false
+    }
+  ).addTo(map);
+
+  // MARKER
+
+  marker = L.marker(
+    [currentPosition.lat, currentPosition.lng],
+    {
+      draggable: true
+    }
+  ).addTo(map);
+
+  marker.bindPopup("ঠিকানা নির্বাচন করুন");
+
+  // MAP CLICK
+
+  map.on("click", function(event) {
+
+    selectLocation(
+      event.latlng.lat,
+      event.latlng.lng
+    );
+
+  });
+
+  // MARKER DRAG
+
+  marker.on("dragend", function() {
+
+    const p = marker.getLatLng();
+
+    selectLocation(p.lat, p.lng);
+
+  });
+
+  restoreAddresses();
+
+  const home = getSaved("home");
+  const current = getSaved("current");
+
+  const saved = home || current;
+
+  if (saved) {
+    selectLocation(
+      saved.lat,
+      saved.lng,
+      false,
+      saved.address
+    );
+  }
+
+  message("Street ও Satellite Map প্রস্তুত।");
+
+  setTimeout(() => map.invalidateSize(), 300);
 }
 
-// ======================================
-// SEARCH ADDRESS
-// ======================================
+// ===================================
+// SELECT LOCATION
+// ===================================
 
-function searchAddress() {
+async function selectLocation(
+  lat,
+  lng,
+  reverse = true,
+  savedAddress = ""
+) {
+
+  selectionVersion++;
+
+  const version = selectionVersion;
+
+  selected = {
+    lat: Number(lat),
+    lng: Number(lng),
+    address: savedAddress || "ঠিকানা খোঁজা হচ্ছে..."
+  };
+
+  currentPosition = {
+    lat: selected.lat,
+    lng: selected.lng
+  };
+
+  marker.setLatLng([lat, lng]);
+
+  map.setView([lat, lng], 17);
+
+  $("selectedAddress").textContent =
+    selected.address;
+
+  $("coords").textContent =
+    "Latitude: " + lat.toFixed(6) +
+    " | Longitude: " + lng.toFixed(6);
+
+  if (reverse) {
+    await reverseGeocode(lat, lng, version);
+  }
+}
+
+// ===================================
+// REVERSE GEOCODING
+// PHOTON OPEN GEOCODER
+// ===================================
+
+async function reverseGeocode(lat, lng, version) {
+
+  try {
+
+    const url =
+      "https://photon.komoot.io/reverse?" +
+      "lat=" + encodeURIComponent(lat) +
+      "&lon=" + encodeURIComponent(lng);
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("Address service error");
+    }
+
+    const data = await response.json();
+
+    if (version !== selectionVersion) return;
+
+    if (
+      data.features &&
+      data.features.length > 0
+    ) {
+
+      const address = formatAddress(
+        data.features[0].properties
+      );
+
+      selected.address = address;
+
+      $("selectedAddress").textContent = address;
+
+      message("ঠিকানা পাওয়া গেছে।");
+
+    } else {
+
+      selected.address =
+        lat.toFixed(6) + ", " + lng.toFixed(6);
+
+      $("selectedAddress").textContent =
+        selected.address;
+
+      message("স্থানাঙ্ক পাওয়া গেছে।");
+
+    }
+
+  } catch (error) {
+
+    if (version !== selectionVersion) return;
+
+    selected.address =
+      lat.toFixed(6) + ", " + lng.toFixed(6);
+
+    $("selectedAddress").textContent =
+      selected.address;
+
+    message(
+      "ঠিকানার নাম পাওয়া যায়নি। স্থানাঙ্ক সংরক্ষণ করতে পারবেন।",
+      true
+    );
+  }
+}
+
+// ===================================
+// FORMAT ADDRESS
+// ===================================
+
+function formatAddress(p) {
+
+  const parts = [
+    p.name,
+    p.street,
+    p.district,
+    p.city,
+    p.state,
+    p.country
+  ];
+
+  const unique = [...new Set(
+    parts.filter(Boolean)
+  )];
+
+  return unique.join(", ") || "ঠিকানা পাওয়া যায়নি";
+}
+
+// ===================================
+// SEARCH LOCATION
+// ===================================
+
+async function searchAddress() {
 
   const query = $("searchAddress").value.trim();
 
   if (!query) {
-    showStatus("অনুগ্রহ করে ঠিকানা লিখুন।", true);
+    message("ঠিকানা লিখুন।", true);
     return;
   }
 
-  if (!geocoder) {
-    showStatus("Google Maps এখনো চালু হয়নি।", true);
-    return;
-  }
+  message("ঠিকানা খোঁজা হচ্ছে...");
 
-  showStatus("ঠিকানা খোঁজা হচ্ছে...");
+  $("searchResults").replaceChildren();
 
-  geocoder.geocode(
-    { address: query },
-    (results, resultStatus) => {
+  try {
 
-      if (
-        resultStatus === "OK" &&
-        results.length > 0
-      ) {
+    const url =
+      "https://photon.komoot.io/api/?" +
+      "q=" + encodeURIComponent(query) +
+      "&limit=5";
 
-        const location = results[0].geometry.location;
+    const response = await fetch(url);
 
-        selectLocation({
-          lat: location.lat(),
-          lng: location.lng()
-        });
-
-        showStatus("ঠিকানা পাওয়া গেছে।");
-
-      } else {
-
-        showStatus(
-          "ঠিকানা পাওয়া যায়নি। আবার চেষ্টা করুন।",
-          true
-        );
-      }
+    if (!response.ok) {
+      throw new Error("Search failed");
     }
-  );
+
+    const data = await response.json();
+
+    const results = data.features || [];
+
+    if (!results.length) {
+      message("কোনো ঠিকানা পাওয়া যায়নি।", true);
+      return;
+    }
+
+    results.forEach(feature => {
+
+      const p = feature.properties;
+
+      const coords = feature.geometry.coordinates;
+
+      const lat = coords[1];
+      const lng = coords[0];
+
+      const button = document.createElement("button");
+
+      button.className = "result-item";
+
+      button.textContent = formatAddress(p);
+
+      button.addEventListener("click", () => {
+
+        $("searchResults").replaceChildren();
+
+        selectLocation(lat, lng);
+
+      });
+
+      $("searchResults").appendChild(button);
+
+    });
+
+    message("নিচে পাওয়া ঠিকানাগুলো দেখুন।");
+
+  } catch (error) {
+
+    message(
+      "ঠিকানা খুঁজতে সমস্যা হয়েছে। ইন্টারনেট পরীক্ষা করুন।",
+      true
+    );
+
+  }
 }
 
-// ======================================
-// CURRENT GPS LOCATION
-// ======================================
+// ===================================
+// GPS LOCATION
+// ===================================
 
 function getCurrentLocation() {
 
   if (!navigator.geolocation) {
-    showStatus("আপনার ব্রাউজারে GPS সমর্থিত নয়।", true);
+    message("আপনার ডিভাইসে GPS সমর্থিত নয়।", true);
     return;
   }
 
-  showStatus("আপনার বর্তমান লোকেশন খোঁজা হচ্ছে...");
+  message("বর্তমান লোকেশন খোঁজা হচ্ছে...");
 
   navigator.geolocation.getCurrentPosition(
 
-    (position) => {
+    async position => {
 
-      const location = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
 
-      selectLocation(location);
+      $("saveAs").value = "current";
 
-      // GPS থেকে পাওয়া অবস্থান বর্তমান ঠিকানা হিসেবে সংরক্ষণ
+      await selectLocation(lat, lng);
 
-      setTimeout(() => {
+      // Automatically save GPS as current address
+      saveAddress("current");
 
-        if (
-          selected &&
-          selected.lat === location.lat &&
-          selected.lng === location.lng
-        ) {
-          saveAddress("current");
-        }
-
-      }, 1200);
+      message("বর্তমান লোকেশন সংরক্ষিত হয়েছে।");
 
     },
 
-    (error) => {
+    error => {
 
-      let message = "লোকেশন পাওয়া যায়নি।";
+      let msg = "লোকেশন পাওয়া যায়নি।";
 
       if (error.code === 1) {
-        message = "লোকেশন ব্যবহারের অনুমতি দিন।";
-      } else if (error.code === 2) {
-        message = "GPS অবস্থান পাওয়া যাচ্ছে না।";
-      } else if (error.code === 3) {
-        message = "লোকেশন খুঁজতে সময় শেষ হয়েছে।";
+        msg = "লোকেশন ব্যবহারের অনুমতি দিন।";
       }
 
-      showStatus(message, true);
+      if (error.code === 2) {
+        msg = "GPS সিগন্যাল পাওয়া যাচ্ছে না।";
+      }
+
+      if (error.code === 3) {
+        msg = "GPS খুঁজতে সময় শেষ হয়েছে।";
+      }
+
+      message(msg, true);
 
     },
 
@@ -329,59 +426,69 @@ function getCurrentLocation() {
       timeout: 20000,
       maximumAge: 0
     }
+
   );
 }
 
-// ======================================
+// ===================================
 // SAVE ADDRESS
-// ======================================
+// ===================================
 
 function saveAddress(type) {
 
   if (!selected) {
-    showStatus("প্রথমে ম্যাপে একটি ঠিকানা নির্বাচন করুন।", true);
+    message("প্রথমে ম্যাপে ঠিকানা নির্বাচন করুন।", true);
     return;
   }
 
-  const address = {
+  const data = {
     lat: selected.lat,
     lng: selected.lng,
-    address: selected.address || "ঠিকানা নির্ধারিত হয়নি"
+    address: selected.address
   };
 
   try {
 
     localStorage.setItem(
       STORAGE[type],
-      JSON.stringify(address)
+      JSON.stringify(data)
     );
 
-    renderSavedAddresses();
+    restoreAddresses();
 
-    showStatus(
+    message(
       type === "home"
-        ? "স্থায়ী ঠিকানা সফলভাবে সংরক্ষিত হয়েছে।"
-        : "বর্তমান ঠিকানা সফলভাবে সংরক্ষিত হয়েছে।"
+        ? "স্থায়ী ঠিকানা সংরক্ষিত হয়েছে।"
+        : "বর্তমান ঠিকানা সংরক্ষিত হয়েছে।"
     );
 
   } catch (error) {
 
-    showStatus("ঠিকানা সংরক্ষণ করা যায়নি।", true);
+    message("ঠিকানা সংরক্ষণ করা যায়নি।", true);
 
   }
 }
 
-// ======================================
+// ===================================
 // GET SAVED ADDRESS
-// ======================================
+// ===================================
 
-function getAddress(type) {
+function getSaved(type) {
 
   try {
 
     const data = localStorage.getItem(STORAGE[type]);
 
-    return data ? JSON.parse(data) : null;
+    if (!data) return null;
+
+    const parsed = JSON.parse(data);
+
+    if (
+      !Number.isFinite(parsed.lat) ||
+      !Number.isFinite(parsed.lng)
+    ) return null;
+
+    return parsed;
 
   } catch (error) {
 
@@ -390,13 +497,26 @@ function getAddress(type) {
   }
 }
 
-// ======================================
-// RESTORE SAVED ADDRESSES
-// ======================================
+// ===================================
+// RESTORE ADDRESSES
+// ===================================
 
-function restoreSavedAddresses() {
+function restoreAddresses() {
 
-  renderSavedAddresses();
+  const home = getSaved("home");
+  const current = getSaved("current");
+
+  $("homeAddress").textContent = home
+    ? home.address +
+      " | " + home.lat.toFixed(5) +
+      ", " + home.lng.toFixed(5)
+    : "কোনো স্থায়ী ঠিকানা সংরক্ষিত নেই।";
+
+  $("currentAddress").textContent = current
+    ? current.address +
+      " | " + current.lat.toFixed(5) +
+      ", " + current.lng.toFixed(5)
+    : "কোনো বর্তমান ঠিকানা সংরক্ষিত নেই।";
 
   const madhhab = localStorage.getItem(STORAGE.madhhab);
 
@@ -405,67 +525,66 @@ function restoreSavedAddresses() {
   }
 }
 
-// ======================================
-// DISPLAY SAVED ADDRESSES
-// ======================================
+// ===================================
+// SHOW SAVED LOCATION
+// ===================================
 
-function renderSavedAddresses() {
+function showSaved(type) {
 
-  const home = getAddress("home");
-  const current = getAddress("current");
+  const data = getSaved(type);
 
-  $("homeAddress").textContent = home
-    ? home.address +
-      " | " + home.lat.toFixed(6) +
-      ", " + home.lng.toFixed(6)
-    : "কোনো স্থায়ী ঠিকানা সংরক্ষিত নেই";
-
-  $("currentAddress").textContent = current
-    ? current.address +
-      " | " + current.lat.toFixed(6) +
-      ", " + current.lng.toFixed(6)
-    : "কোনো বর্তমান ঠিকানা সংরক্ষিত নেই";
-}
-
-// ======================================
-// SHOW SAVED LOCATION ON MAP
-// ======================================
-
-function showSavedLocation(type) {
-
-  const address = getAddress(type);
-
-  if (!address) {
-    showStatus("এই ঠিকানা এখনো সংরক্ষণ করা হয়নি।", true);
+  if (!data) {
+    message("সংরক্ষিত ঠিকানা নেই।", true);
     return;
   }
 
-  selectLocation(address, false);
-
-  showStatus(
-    type === "home"
-      ? "স্থায়ী ঠিকানা ম্যাপে দেখানো হচ্ছে।"
-      : "বর্তমান ঠিকানা ম্যাপে দেখানো হচ্ছে।"
+  selectLocation(
+    data.lat,
+    data.lng,
+    false,
+    data.address
   );
+
+  message("সংরক্ষিত ঠিকানা ম্যাপে দেখানো হচ্ছে।");
+
 }
 
-// ======================================
-// MADHHAB STORAGE
-// ======================================
+// ===================================
+// DELETE ADDRESS
+// ===================================
 
-function saveMadhhab() {
+function deleteAddress(type) {
+
+  if (!getSaved(type)) {
+    message("মুছে ফেলার মতো ঠিকানা নেই।", true);
+    return;
+  }
+
+  localStorage.removeItem(STORAGE[type]);
+
+  restoreAddresses();
+
+  message("ঠিকানা মুছে ফেলা হয়েছে।");
+}
+
+// ===================================
+// SAVE MADHHAB
+// ===================================
+
+$("madhhab").addEventListener("change", () => {
 
   localStorage.setItem(
     STORAGE.madhhab,
     $("madhhab").value
   );
 
-  showStatus("মাযহাব সংরক্ষণ করা হয়েছে।");
-}
+  message("মাযহাব সংরক্ষণ হয়েছে।");
 
-// ======================================
+});
+
+// ===================================
 // BUTTON EVENTS
-// ======================================
+// ===================================
 
 $("searchBtn").addEventListener(
   "click",
@@ -474,7 +593,7 @@ $("searchBtn").addEventListener(
 
 $("searchAddress").addEventListener(
   "keydown",
-  (event) => {
+  event => {
     if (event.key === "Enter") {
       searchAddress();
     }
@@ -488,29 +607,31 @@ $("gpsBtn").addEventListener(
 
 $("saveBtn").addEventListener(
   "click",
-  () => {
-    saveAddress($("saveAs").value);
-  }
+  () => saveAddress($("saveAs").value)
 );
 
 $("selectHomeBtn").addEventListener(
   "click",
-  () => showSavedLocation("home")
+  () => showSaved("home")
 );
 
 $("selectCurrentBtn").addEventListener(
   "click",
-  () => showSavedLocation("current")
+  () => showSaved("current")
 );
 
-$("madhhab").addEventListener(
-  "change",
-  saveMadhhab
+$("deleteHomeBtn").addEventListener(
+  "click",
+  () => deleteAddress("home")
 );
 
-// ======================================
-// START APPLICATION
-// ======================================
+$("deleteCurrentBtn").addEventListener(
+  "click",
+  () => deleteAddress("current")
+);
 
-loadGoogleMaps();
+// ===================================
+// START
+// ===================================
 
+initMap();
