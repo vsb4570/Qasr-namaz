@@ -1,0 +1,12 @@
+*{box-sizing:border-box} :root{--green:#145c46;--pale:#eaf4ef;--ink:#18332b;--muted:#687a73}
+body{margin:0;background:#f3f7f4;color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;line-height:1.55}
+.top{background:var(--green);color:white;padding:18px max(18px,calc((100% - 850px)/2));display:flex;align-items:center;gap:12px}
+.brandmark{width:44px;height:44px;border-radius:14px;background:#ffffff22;display:grid;place-items:center;font-size:25px}
+h1{font-size:21px;margin:0}.top p{margin:0;color:#d5e8df;font-size:13px}.vtag{margin-left:auto;font-size:11px;border:1px solid #ffffff66;border-radius:20px;padding:4px 9px}
+main{max-width:850px;margin:20px auto;padding:0 14px}.card{background:white;border:1px solid #e0e9e3;border-radius:18px;padding:18px;margin-bottom:15px;box-shadow:0 4px 16px #173b2b08}
+h2{font-size:18px;margin:0 0 8px}h3{font-size:15px;margin:18px 0 8px}.intro p{margin:5px 0 12px}.actions,.searchrow{display:flex;gap:8px;flex-wrap:wrap}
+button,select,input{font:inherit;border-radius:10px;padding:11px 12px;border:1px solid #cbd9d0;background:white;color:var(--ink)}
+button{cursor:pointer;font-weight:650}.primary{background:var(--green);color:white;border-color:var(--green)}.secondary{background:white}
+button:disabled{opacity:.45;cursor:not-allowed}label{display:block;font-weight:600;margin:12px 0 6px}select{width:100%;margin:6px 0 10px}.searchrow input{flex:1;min-width:170px}
+#map{height:320px;border-radius:14px;margin-top:12px;border:1px solid #dce6df;z-index:1}.hint,.muted{color:var(--muted);font-size:13px}.status{font-size:13px;color:#dceee5}.selected{background:var(--pale);padding:13px;border-radius:13px;margin-top:12px}.selected p{margin:6px 0}.savedlist{display:grid;gap:8px}.saveditem{border:1px solid #e1e9e4;border-radius:11px;padding:10px;font-size:14px}.saveditem strong{display:block}.note{border-left:4px solid #d39b35}.note p{margin-bottom:0;font-size:14px}footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}
+@media(max-width:520px){.top{padding:14px}.vtag{font-size:10px}.card{padding:14px}#map{height:280px}.actions button{flex:1}}
