@@ -4,10 +4,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#075e54">
+
 <title>Qasr Namaz - Map Based</title>
 
 <link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
 * {
@@ -25,7 +27,7 @@ header {
   background: #075e54;
   color: white;
   text-align: center;
-  padding: 20px 10px;
+  padding: 22px 10px;
 }
 
 header h2 {
@@ -35,14 +37,14 @@ header h2 {
 .container {
   max-width: 900px;
   margin: auto;
-  padding: 15px;
+  padding: 14px;
 }
 
 .card {
   background: white;
   padding: 18px;
   border-radius: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 16px;
   box-shadow: 0 2px 8px #0001;
 }
 
@@ -51,43 +53,63 @@ header h2 {
   margin-top: 0;
 }
 
-input {
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+input, select {
   width: 100%;
   padding: 12px;
-  margin: 6px 0 12px;
+  margin: 7px 0;
   border: 1px solid #cbd5e1;
   border-radius: 7px;
   font-size: 15px;
+  background: white;
 }
 
 button {
   border: none;
-  padding: 12px;
+  padding: 12px 15px;
   border-radius: 7px;
   background: #087f5b;
   color: white;
   font-size: 15px;
   cursor: pointer;
-  margin: 4px 2px;
+  margin: 5px 2px;
 }
 
 button:active {
   opacity: .8;
 }
 
-.secondary {
+.blue {
   background: #2563eb;
 }
 
-.danger {
+.red {
   background: #dc2626;
 }
 
+.full {
+  width: 100%;
+}
+
 #map {
-  height: 400px;
+  height: 380px;
   width: 100%;
   border-radius: 10px;
   z-index: 1;
+}
+
+.info {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 10px;
+  line-height: 1.8;
+  word-break: break-word;
 }
 
 .result {
@@ -99,32 +121,29 @@ button:active {
 }
 
 .distance {
-  font-size: 22px;
+  font-size: 25px;
   font-weight: bold;
   color: #075e54;
 }
 
-.status {
-  font-size: 18px;
+.pass {
+  color: #087f5b;
   font-weight: bold;
 }
 
-small {
-  color: #64748b;
-}
-
-.location-info {
-  background: #f8fafc;
-  padding: 10px;
-  border-radius: 7px;
-  margin-top: 10px;
-  font-size: 14px;
-  word-break: break-word;
+.fail {
+  color: #dc2626;
+  font-weight: bold;
 }
 
 footer {
   text-align: center;
-  padding: 20px;
+  padding: 22px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+small {
   color: #64748b;
 }
 </style>
@@ -134,209 +153,249 @@ footer {
 
 <header>
   <h2>🕌 কসর নামাজ</h2>
-  <div>Map Based Distance Calculator</div>
-  <p>৪৭ মাইল দূরত্ব নির্ধারণ ব্যবস্থা</p>
+  <div>Map Based Qasr Namaz System</div>
+  <p>৪৭ মাইল দূরত্ব নির্ধারণ</p>
 </header>
 
 <div class="container">
 
-  <div class="card">
-    <h3>🏠 স্থায়ী ঠিকানা</h3>
+<!-- স্থায়ী ঠিকানা -->
 
-    <label>স্থায়ী ঠিকানার নাম</label>
-    <input id="homeName"
-      placeholder="স্থায়ী ঠিকানা লিখুন">
+<div class="card">
 
-    <label>Latitude</label>
-    <input id="homeLat"
-      type="number" step="any"
-      placeholder="Latitude">
+<h3>🏠 স্থায়ী ঠিকানা</h3>
 
-    <label>Longitude</label>
-    <input id="homeLng"
-      type="number" step="any"
-      placeholder="Longitude">
+<label>ঠিকানার নাম</label>
+<input id="homeName"
+placeholder="স্থায়ী ঠিকানা লিখুন">
 
-    <button onclick="getGPS('home')">
-      📍 GPS দিয়ে স্থায়ী অবস্থান নিন
-    </button>
+<label>Latitude</label>
+<input id="homeLat" type="number" step="any"
+placeholder="Latitude">
 
-    <button onclick="saveLocation('home')">
-      💾 স্থায়ী ঠিকানা সংরক্ষণ
-    </button>
+<label>Longitude</label>
+<input id="homeLng" type="number" step="any"
+placeholder="Longitude">
 
-    <div id="homeInfo" class="location-info">
-      স্থায়ী ঠিকানা নির্বাচন করুন।
-    </div>
-  </div>
+<button class="blue full"
+onclick="getGPS('home')">
+📍 GPS দিয়ে অবস্থান নিন
+</button>
 
-  <div class="card">
-    <h3>📍 বর্তমান ঠিকানা</h3>
+<button class="full"
+onclick="saveLocation('home')">
+💾 স্থায়ী ঠিকানা সংরক্ষণ
+</button>
 
-    <label>বর্তমান ঠিকানার নাম</label>
-    <input id="currentName"
-      placeholder="বর্তমান ঠিকানা লিখুন">
+<div id="homeInfo" class="info">
+স্থায়ী ঠিকানা নির্বাচন করুন।
+</div>
 
-    <label>Latitude</label>
-    <input id="currentLat"
-      type="number" step="any"
-      placeholder="Latitude">
+</div>
 
-    <label>Longitude</label>
-    <input id="currentLng"
-      type="number" step="any"
-      placeholder="Longitude">
+<!-- বর্তমান ঠিকানা -->
 
-    <button onclick="getGPS('current')">
-      📍 GPS দিয়ে বর্তমান অবস্থান নিন
-    </button>
+<div class="card">
 
-    <button onclick="saveLocation('current')">
-      💾 বর্তমান ঠিকানা সংরক্ষণ
-    </button>
+<h3>📍 বর্তমান ঠিকানা</h3>
 
-    <div id="currentInfo" class="location-info">
-      বর্তমান ঠিকানা নির্বাচন করুন।
-    </div>
-  </div>
+<label>ঠিকানার নাম</label>
+<input id="currentName"
+placeholder="বর্তমান ঠিকানা লিখুন">
 
-  <div class="card">
-    <h3>🧭 বর্তমান অবস্থান</h3>
+<label>Latitude</label>
+<input id="currentLat" type="number" step="any"
+placeholder="Latitude">
 
-    <p>
-      GPS ব্যবহার করে আপনার বর্তমান অবস্থান
-      ম্যাপে দেখুন।
-    </p>
+<label>Longitude</label>
+<input id="currentLng" type="number" step="any"
+placeholder="Longitude">
 
-    <button class="secondary"
-      onclick="getGPS('live')">
-      🎯 আমার বর্তমান অবস্থান
-    </button>
+<button class="blue full"
+onclick="getGPS('current')">
+📍 GPS দিয়ে অবস্থান নিন
+</button>
 
-    <div id="liveInfo" class="location-info">
-      GPS অবস্থান এখনো নির্ধারণ করা হয়নি।
-    </div>
-  </div>
+<button class="full"
+onclick="saveLocation('current')">
+💾 বর্তমান ঠিকানা সংরক্ষণ
+</button>
 
-  <div class="card">
-    <h3>🗺️ ম্যাপ থেকে ঠিকানা নির্বাচন</h3>
+<div id="currentInfo" class="info">
+বর্তমান ঠিকানা নির্বাচন করুন।
+</div>
 
-    <p>
-      প্রথমে নিচের অপশন থেকে ঠিকানা নির্বাচন করুন।
-      এরপর ম্যাপে পিন বসান।
-    </p>
+</div>
 
-    <select id="mapTarget"
-      style="width:100%;padding:12px;border-radius:7px;">
-      <option value="home">স্থায়ী ঠিকানা</option>
-      <option value="current">বর্তমান ঠিকানা</option>
-    </select>
+<!-- বর্তমান অবস্থান -->
 
-    <div id="map"></div>
+<div class="card">
 
-    <p>
-      <small>
-        ম্যাপে ক্লিক করলে নির্বাচিত ঠিকানার
-        Latitude ও Longitude বসে যাবে।
-      </small>
-    </p>
-  </div>
+<h3>🧭 বর্তমান অবস্থান (GPS)</h3>
 
-  <div class="card">
-    <h3>📏 ৪৭ মাইল দূরত্ব পরীক্ষা</h3>
+<p>
+আপনার মোবাইলের GPS চালু করে বর্তমান অবস্থান নির্ণয় করুন।
+</p>
 
-    <p>
-      নির্ধারিত দূরত্ব:
-      <b>৪৭ মাইল = ৭৫.৬৩৯ কিলোমিটার</b>
-    </p>
+<button class="blue full"
+onclick="getGPS('live')">
+🎯 আমার বর্তমান অবস্থান নির্ণয়
+</button>
 
-    <button onclick="calculateDistance()">
-      📐 দূরত্ব হিসাব করুন
-    </button>
+<div id="liveInfo" class="info">
+বর্তমান অবস্থান নির্ধারণ করা হয়নি।
+</div>
 
-    <div id="result" class="result">
-      দূরত্বের ফলাফল এখানে দেখানো হবে।
-    </div>
-  </div>
+</div>
 
-  <div class="card">
-    <h3>💾 সংরক্ষিত ঠিকানা</h3>
+<!-- ম্যাপ -->
 
-    <div id="savedList"></div>
+<div class="card">
 
-    <button class="danger"
-      onclick="clearData()">
-      🗑️ সব ঠিকানা মুছে ফেলুন
-    </button>
-  </div>
+<h3>🗺️ ম্যাপ থেকে ঠিকানা নির্বাচন</h3>
+
+<label>কোন ঠিকানা নির্বাচন করবেন?</label>
+
+<select id="mapTarget">
+<option value="home">স্থায়ী ঠিকানা</option>
+<option value="current">বর্তমান ঠিকানা</option>
+</select>
+
+<p>
+ম্যাপে ক্লিক করে স্থায়ী বা বর্তমান ঠিকানা নির্বাচন করুন।
+</p>
+
+<div id="map"></div>
+
+</div>
+
+<!-- দূরত্ব -->
+
+<div class="card">
+
+<h3>📏 দূরত্ব পরীক্ষা</h3>
+
+<div class="info">
+  <b>নির্ধারিত সীমা</b><br>
+  ৪৭ মাইল<br>
+  ৭৫.৬৩৯ কিলোমিটার
+</div>
+
+<button class="full"
+onclick="calculateDistance()">
+📐 দূরত্ব হিসাব করুন
+</button>
+
+<div id="result" class="result">
+দূরত্বের ফলাফল এখানে দেখানো হবে।
+</div>
+
+</div>
+
+<!-- সংরক্ষিত তথ্য -->
+
+<div class="card">
+
+<h3>💾 সংরক্ষিত ঠিকানা</h3>
+
+<div id="savedList" class="info">
+কোনো ঠিকানা সংরক্ষিত নেই।
+</div>
+
+<button class="red full"
+onclick="clearData()">
+🗑️ সব ঠিকানা মুছে ফেলুন
+</button>
+
+</div>
 
 </div>
 
 <footer>
-  Qasr Namaz Distance Calculator<br>
-  Map Powered by OpenStreetMap
+Qasr Namaz Map System<br>
+Powered by OpenStreetMap
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 
-// নির্ধারিত দূরত্ব
-const LIMIT_MILES = 47;
-const LIMIT_KM = LIMIT_MILES * 1.609344;
+// =============================
+// সেটিংস
+// =============================
 
-// ডাটা
+const LIMIT_MILES = 47;
+const LIMIT_KM = 47 * 1.609344;
+
 let locations = {
   home: null,
   current: null,
   live: null
 };
 
-// ম্যাপ
-const map = L.map('map').setView([23.8103, 90.4125], 7);
+let markers = {};
+
+// =============================
+// ম্যাপ তৈরি
+// =============================
+
+const map = L.map('map').setView(
+  [23.8103, 90.4125], 7
+);
 
 L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   {
-    attribution: '&copy; OpenStreetMap contributors',
+    attribution: '&copy; OpenStreetMap',
     maxZoom: 19
   }
 ).addTo(map);
 
-let markers = {};
-
+// =============================
 // ম্যাপে ক্লিক
+// =============================
+
 map.on('click', function(e) {
 
-  const target =
+  const type =
     document.getElementById('mapTarget').value;
 
-  const lat = e.latlng.lat;
-  const lng = e.latlng.lng;
+  setCoordinates(
+    type,
+    e.latlng.lat,
+    e.latlng.lng
+  );
 
-  setCoordinates(target, lat, lng);
-
-  reverseAddress(target, lat, lng);
+  reverseAddress(
+    type,
+    e.latlng.lat,
+    e.latlng.lng
+  );
 
 });
 
-// ঠিকানার কোঅর্ডিনেট বসানো
+// =============================
+// কোঅর্ডিনেট সেট
+// =============================
+
 function setCoordinates(type, lat, lng) {
 
-  const prefix =
-    type === 'home' ? 'home' : 'current';
+  const prefix = type;
+
+  const name =
+    document.getElementById(prefix + 'Name').value;
+
+  locations[type] = {
+    name: name,
+    lat: lat,
+    lng: lng
+  };
 
   document.getElementById(prefix + 'Lat').value =
     lat.toFixed(6);
 
   document.getElementById(prefix + 'Lng').value =
     lng.toFixed(6);
-
-  locations[type] = {
-    name: document.getElementById(prefix + 'Name').value,
-    lat: lat,
-    lng: lng
-  };
 
   if(markers[type]) {
     map.removeLayer(markers[type]);
@@ -345,16 +404,22 @@ function setCoordinates(type, lat, lng) {
   markers[type] = L.marker([lat,lng])
     .addTo(map)
     .bindPopup(
-      type === 'home' ?
-      'স্থায়ী ঠিকানা' : 'বর্তমান ঠিকানা'
-    )
-    .openPopup();
+      type === 'home'
+      ? 'স্থায়ী ঠিকানা'
+      : 'বর্তমান ঠিকানা'
+    );
+
+  markers[type].openPopup();
 
   updateInfo(type);
+
 }
 
-// ঠিকানা থেকে নাম খোঁজা
-async function reverseAddress(type, lat, lng) {
+// =============================
+// ঠিকানা খোঁজা
+// =============================
+
+async function reverseAddress(type,lat,lng) {
 
   try {
 
@@ -367,23 +432,26 @@ async function reverseAddress(type, lat, lng) {
 
     if(data.display_name) {
 
-      const prefix =
-        type === 'home' ? 'home' : 'current';
-
-      document.getElementById(prefix + 'Name').value =
+      document.getElementById(type + 'Name').value =
         data.display_name;
 
-      locations[type].name = data.display_name;
+      locations[type].name =
+        data.display_name;
 
       updateInfo(type);
+
     }
 
   } catch(error) {
-    console.log('Address lookup failed', error);
+    console.log(error);
   }
+
 }
 
+// =============================
 // GPS
+// =============================
+
 function getGPS(type) {
 
   if(!navigator.geolocation) {
@@ -400,7 +468,10 @@ function getGPS(type) {
 
       if(type === 'live') {
 
-        locations.live = {lat, lng};
+        locations.live = {
+          lat: lat,
+          lng: lng
+        };
 
         if(markers.live) {
           map.removeLayer(markers.live);
@@ -408,25 +479,24 @@ function getGPS(type) {
 
         markers.live = L.marker([lat,lng])
           .addTo(map)
-          .bindPopup('আপনার বর্তমান অবস্থান')
+          .bindPopup('বর্তমান GPS অবস্থান')
           .openPopup();
+
+        map.setView([lat,lng],15);
 
         document.getElementById('liveInfo').innerHTML =
           'Latitude: ' + lat.toFixed(6) +
-          '<br>Longitude: ' + lng.toFixed(6);
-
-        map.setView([lat,lng], 15);
+          '<br>Longitude: ' + lng.toFixed(6) +
+          '<br>GPS Accuracy: ±' +
+          Math.round(position.coords.accuracy) + ' মিটার';
 
         reverseAddressLive(lat,lng);
 
       } else {
 
-        setCoordinates(type, lat, lng);
+        setCoordinates(type,lat,lng);
 
-        const prefix =
-          type === 'home' ? 'home' : 'current';
-
-        map.setView([lat,lng], 15);
+        map.setView([lat,lng],15);
 
         reverseAddress(type,lat,lng);
 
@@ -437,22 +507,25 @@ function getGPS(type) {
     function(error) {
 
       alert(
-        'GPS অবস্থান পাওয়া যায়নি। ' +
-        'Location Permission চালু করুন।'
+        'GPS পাওয়া যায়নি। Location Permission চালু করুন।'
       );
 
     },
 
     {
       enableHighAccuracy: true,
-      timeout: 15000,
+      timeout: 20000,
       maximumAge: 0
     }
 
   );
+
 }
 
-// বর্তমান অবস্থানের ঠিকানা
+// =============================
+// GPS ঠিকানা
+// =============================
+
 async function reverseAddressLive(lat,lng) {
 
   try {
@@ -465,43 +538,71 @@ async function reverseAddressLive(lat,lng) {
     const data = await response.json();
 
     if(data.display_name) {
+
       document.getElementById('liveInfo').innerHTML +=
-        '<br>' + data.display_name;
+        '<br>ঠিকানা: ' + escapeHTML(data.display_name);
+
     }
 
-  } catch(e) {
-    console.log(e);
+  } catch(error) {
+    console.log(error);
   }
 
 }
 
-// সংরক্ষণ
+// =============================
+// HTML নিরাপত্তা
+// =============================
+
+function escapeHTML(value) {
+
+  return String(value).replace(/[&<>"']/g, function(c) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[c];
+  });
+
+}
+
+// =============================
+// ঠিকানা সংরক্ষণ
+// =============================
+
 function saveLocation(type) {
 
-  const prefix =
-    type === 'home' ? 'home' : 'current';
-
   const name =
-    document.getElementById(prefix + 'Name').value;
+    document.getElementById(type + 'Name').value.trim();
 
   const lat = parseFloat(
-    document.getElementById(prefix + 'Lat').value
+    document.getElementById(type + 'Lat').value
   );
 
   const lng = parseFloat(
-    document.getElementById(prefix + 'Lng').value
+    document.getElementById(type + 'Lng').value
   );
 
-  if(!name || !Number.isFinite(lat) ||
-     !Number.isFinite(lng) ||
-     lat < -90 || lat > 90 ||
-     lng < -180 || lng > 180) {
+  if(
+    !name ||
+    !Number.isFinite(lat) ||
+    !Number.isFinite(lng) ||
+    lat < -90 || lat > 90 ||
+    lng < -180 || lng > 180
+  ) {
 
-    alert('সঠিক ঠিকানা ও Latitude/Longitude দিন।');
+    alert('সঠিক ঠিকানা ও কোঅর্ডিনেট দিন।');
     return;
+
   }
 
-  locations[type] = {name,lat,lng};
+  locations[type] = {
+    name: name,
+    lat: lat,
+    lng: lng
+  };
 
   localStorage.setItem(
     'qasr_' + type,
@@ -511,101 +612,31 @@ function saveLocation(type) {
   updateInfo(type);
   showSaved();
 
-  alert('ঠিকানা সফলভাবে সংরক্ষণ হয়েছে।');
+  alert('ঠিকানা সংরক্ষণ হয়েছে।');
+
 }
 
-// তথ্য দেখানো
-function updateInfo(type) {
+// =============================
+// ঠিকানা দেখানো
+// =============================
 
-  const prefix =
-    type === 'home' ? 'home' : 'current';
+function updateInfo(type) {
 
   const item = locations[type];
 
   if(!item) return;
 
-  document.getElementById(prefix + 'Info').innerHTML =
-    'ঠিকানা: ' + (item.name || 'নির্বাচিত ঠিকানা') +
+  document.getElementById(type + 'Info').innerHTML =
+    'ঠিকানা: ' + escapeHTML(item.name || '') +
     '<br>Latitude: ' + item.lat.toFixed(6) +
     '<br>Longitude: ' + item.lng.toFixed(6);
 
 }
 
+// =============================
 // দূরত্ব হিসাব
-function calculateDistance() {
+// =============================
 
-  const home = locations.home;
-  const current = locations.current;
-  const live = locations.live;
-
-  if(!home) {
-    alert('প্রথমে স্থায়ী ঠিকানা সংরক্ষণ করুন।');
-    return;
-  }
-
-  let html = '';
-
-  if(current) {
-
-    const d = distance(home,current);
-
-    html += makeResult(
-      'স্থায়ী ঠিকানা থেকে বর্তমান ঠিকানা',
-      d
-    );
-
-  } else {
-
-    html += '<p>বর্তমান ঠিকানা নির্বাচন করা হয়নি।</p>';
-
-  }
-
-  if(live) {
-
-    const d = distance(home,live);
-
-    html += makeResult(
-      'স্থায়ী ঠিকানা থেকে GPS বর্তমান অবস্থান',
-      d
-    );
-
-  } else {
-
-    html += '<p>GPS বর্তমান অবস্থান পাওয়া যায়নি।</p>';
-
-  }
-
-  document.getElementById('result').innerHTML = html;
-
-}
-
-// ফলাফল তৈরি
-function makeResult(title, km) {
-
-  const miles = km / 1.609344;
-
-  const passed = miles >= LIMIT_MILES;
-
-  return `
-    <hr>
-    <b>${title}</b>
-    <div class="distance">
-      ${miles.toFixed(2)} মাইল
-    </div>
-    ${km.toFixed(3)} কিলোমিটার
-    <p>
-      নির্ধারিত সীমা: ${LIMIT_MILES} মাইল
-    </p>
-    <div class="status" style="color:${passed ? '#087f5b' : '#dc2626'}">
-      ${passed ?
-        '✅ ৪৭ মাইল বা তার বেশি' :
-        '❌ ৪৭ মাইলের কম'}
-    </div>
-  `;
-
-}
-
-// Haversine formula
 function distance(a,b) {
 
   const R = 6371;
@@ -616,10 +647,10 @@ function distance(a,b) {
   const dLng = rad(b.lng-a.lng);
 
   const x =
-    Math.sin(dLat/2)**2 +
+    Math.sin(dLat/2) ** 2 +
     Math.cos(rad(a.lat)) *
     Math.cos(rad(b.lat)) *
-    Math.sin(dLng/2)**2;
+    Math.sin(dLng/2) ** 2;
 
   const c = 2 * Math.atan2(
     Math.sqrt(x),
@@ -630,22 +661,121 @@ function distance(a,b) {
 
 }
 
-// সংরক্ষিত ঠিকানা দেখানো
-function showSaved() {
+// =============================
+// ফলাফল
+// =============================
+
+function makeResult(title,km) {
+
+  const miles = km / 1.609344;
+
+  const passed = miles >= LIMIT_MILES;
+
+  return `
+    <hr>
+    <b>${title}</b>
+
+    <div class="distance">
+      ${miles.toFixed(2)} মাইল
+    </div>
+
+    <b>${km.toFixed(3)} কিলোমিটার</b>
+
+    <p>
+      নির্ধারিত দূরত্ব: ৪৭ মাইল
+    </p>
+
+    <div class="${passed ? 'pass' : 'fail'}">
+      ${
+        passed
+        ? '✅ ৪৭ মাইল বা তার বেশি'
+        : '❌ ৪৭ মাইলের কম'
+      }
+    </div>
+  `;
+
+}
+
+// =============================
+// মূল দূরত্ব পরীক্ষা
+// =============================
+
+function calculateDistance() {
 
   const home = locations.home;
   const current = locations.current;
+  const live = locations.live;
+
+  if(!live) {
+
+    alert('প্রথমে GPS দিয়ে বর্তমান অবস্থান নির্ধারণ করুন।');
+    return;
+
+  }
 
   let html = '';
 
-  if(home) {
-    html += '<p>🏠 স্থায়ী ঠিকানা: ' +
-      home.name + '</p>';
-  }
+  // বর্তমান ঠিকানা থেকে বর্তমান অবস্থান
 
   if(current) {
-    html += '<p>📍 বর্তমান ঠিকানা: ' +
-      current.name + '</p>';
+
+    const d1 = distance(current,live);
+
+    html += makeResult(
+      '📍 বর্তমান ঠিকানা থেকে বর্তমান অবস্থান',
+      d1
+    );
+
+  } else {
+
+    html += '<p>বর্তমান ঠিকানা সংরক্ষণ করা হয়নি।</p>';
+
+  }
+
+  // স্থায়ী ঠিকানা থেকে বর্তমান অবস্থান
+
+  if(home) {
+
+    const d2 = distance(home,live);
+
+    html += makeResult(
+      '🏠 স্থায়ী ঠিকানা থেকে বর্তমান অবস্থান',
+      d2
+    );
+
+  } else {
+
+    html += '<p>স্থায়ী ঠিকানা সংরক্ষণ করা হয়নি।</p>';
+
+  }
+
+  document.getElementById('result').innerHTML = html;
+
+}
+
+// =============================
+// সংরক্ষিত তথ্য
+// =============================
+
+function showSaved() {
+
+  let html = '';
+
+  if(locations.home) {
+
+    html +=
+      '<b>🏠 স্থায়ী ঠিকানা</b><br>' +
+      escapeHTML(locations.home.name) +
+      '<br><br>';
+
+  }
+
+  if(locations.current) {
+
+    html +=
+      '<b>📍 বর্তমান ঠিকানা</b><br>' +
+      escapeHTML(locations.current.name);
+
   }
 
   document.getElementById('savedList').innerHTML =
@@ -653,7 +783,10 @@ function showSaved() {
 
 }
 
-// ডাটা মুছে ফেলা
+// =============================
+// সব মুছে ফেলা
+// =============================
+
 function clearData() {
 
   if(!confirm('সব সংরক্ষিত ঠিকানা মুছে ফেলবেন?')) {
@@ -665,24 +798,30 @@ function clearData() {
 
   locations.home = null;
   locations.current = null;
+  locations.live = null;
 
-  ['home','current'].forEach(type => {
+  ['home','current','live'].forEach(type => {
 
     if(markers[type]) {
       map.removeLayer(markers[type]);
       markers[type] = null;
     }
 
-    const prefix = type === 'home' ? 'home' : 'current';
+  });
 
-    document.getElementById(prefix + 'Name').value = '';
-    document.getElementById(prefix + 'Lat').value = '';
-    document.getElementById(prefix + 'Lng').value = '';
+  ['home','current'].forEach(type => {
 
-    document.getElementById(prefix + 'Info').innerHTML =
+    document.getElementById(type + 'Name').value = '';
+    document.getElementById(type + 'Lat').value = '';
+    document.getElementById(type + 'Lng').value = '';
+
+    document.getElementById(type + 'Info').innerHTML =
       'ঠিকানা নির্বাচন করুন।';
 
   });
+
+  document.getElementById('liveInfo').innerHTML =
+    'বর্তমান অবস্থান নির্ধারণ করা হয়নি।';
 
   document.getElementById('result').innerHTML =
     'দূরত্বের ফলাফল এখানে দেখানো হবে।';
@@ -691,37 +830,38 @@ function clearData() {
 
 }
 
-// আগের সংরক্ষিত তথ্য লোড
+// =============================
+// আগের ডাটা লোড
+// =============================
+
 function loadData() {
 
   ['home','current'].forEach(type => {
 
-    const data = localStorage.getItem('qasr_' + type);
+    const saved =
+      localStorage.getItem('qasr_' + type);
 
-    if(data) {
+    if(saved) {
 
       try {
 
-        locations[type] = JSON.parse(data);
+        const item = JSON.parse(saved);
 
-        const item = locations[type];
+        locations[type] = item;
 
-        const prefix =
-          type === 'home' ? 'home' : 'current';
-
-        document.getElementById(prefix + 'Name').value =
+        document.getElementById(type + 'Name').value =
           item.name || '';
 
-        document.getElementById(prefix + 'Lat').value =
-          item.lat;
+        setCoordinates(
+          type,
+          item.lat,
+          item.lng
+        );
 
-        document.getElementById(prefix + 'Lng').value =
-          item.lng;
+      } catch(error) {
 
-        setCoordinates(type,item.lat,item.lng);
+        console.log(error);
 
-      } catch(e) {
-        console.log(e);
       }
 
     }
@@ -732,10 +872,14 @@ function loadData() {
 
 }
 
-// শুরু
+// =============================
+// চালু
+// =============================
+
 loadData();
 
 </script>
 
 </body>
-</html>
+  </html>
+  
